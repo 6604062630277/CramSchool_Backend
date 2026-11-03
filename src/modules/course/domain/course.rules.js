@@ -13,3 +13,10 @@ export function assertCourseOpen(course) {
     throw NotFound('Course not found', 'COURSE_NOT_FOUND');
   }
 }
+
+// กฎ (สำหรับ admin): คอร์สต้องมีอยู่จริง จะเปิดหรือปิดก็ได้
+export function assertCourseExists(course) {
+  if (!course) {
+    throw NotFound('Course not found', 'COURSE_NOT_FOUND');
+  }
+}

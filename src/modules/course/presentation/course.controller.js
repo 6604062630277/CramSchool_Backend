@@ -11,5 +11,19 @@ export function createCourseController({ courseService }) {
     async adminList(req, res) {
       res.json({ data: await courseService.listAll() });
     },
+
+    async adminDetail(req, res) {
+      res.json({ data: await courseService.getAny(req.params.courseId) });
+    },
+
+    async create(req, res) {
+      const course = await courseService.create(req.body);
+      res.status(201).json({ data: course });
+    },
+
+    async update(req, res) {
+      const course = await courseService.update(req.params.courseId, req.body);
+      res.json({ data: course });
+    },
   };
 }
