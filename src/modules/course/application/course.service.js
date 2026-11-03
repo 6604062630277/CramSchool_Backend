@@ -32,9 +32,25 @@ export function createCourseService({ courseRepository, courseTeacherRepository,
     assertCourseExists(course);
     return withTeachers(course);
   }
+  
+  async function create({ teacherIds = [], ...input }) {
+    const uniqueIds = [...new Set(teacherIds)];
 
-  async function create(input) {
-    return courseRepository.create({ ...input, isActive: input.isActive ?? true });
+    // 1) ตรวจครูทุกคนก่อน ถ้าไม่ผ่านจะไม่สร้างคอร์สเลย
+    const teachers = await teacherDirectory.getByTeacherIds(uniqueIds);
+    for (const teacherId of uniqueIds) {
+      assertTeacherAssignable(teachers.find((t) => t.teacherId === teacherId));
+    }
+
+    // 2) สร้างคอร์ส
+    const course = await courseRepository.create({ ...input, isActive: input.isActive ?? true });
+
+    // 3) ผูกครู
+    for (const teacherId of uniqueIds) {
+      await courseTeacherRepository.add(course.id, teacherId);
+    }
+
+    return getAny(course.id);
   }
 
   async function update(courseId, patch) {

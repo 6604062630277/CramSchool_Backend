@@ -16,8 +16,11 @@ const courseFields = {
   isActive: z.boolean().optional(),
 };
 
-// สร้าง: ต้องมีชื่อวิชา ช่องอื่นไม่บังคับ
-export const createCourseSchema = z.object(courseFields);
+// สร้าง: ต้องมีชื่อวิชา ช่องอื่นไม่บังคับ และเลือกครูไปพร้อมกันได้
+export const createCourseSchema = z.object({
+  ...courseFields,
+  teacherIds: z.array(z.string().uuid('teacherId ต้องเป็น UUID')).max(20).optional(),
+});
 
 // แก้ไข: ทุกช่องไม่บังคับ แต่ต้องส่งมาอย่างน้อย 1 ช่อง
 export const updateCourseSchema = z
@@ -33,3 +36,4 @@ export const courseTeacherParamsSchema = z.object({
   courseId: z.string().uuid('courseId ต้องเป็น UUID'),
   teacherId: z.string().uuid('teacherId ต้องเป็น UUID'),
 });
+
