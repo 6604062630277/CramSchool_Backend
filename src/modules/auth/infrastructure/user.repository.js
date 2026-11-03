@@ -1,4 +1,4 @@
-import { AppError } from '../../../shared/errors/AppError.js';
+import { dbError } from '../../../shared/infrastructure/dbError.js';
 
 const TABLE = 'Users';
 const COLUMNS =
@@ -18,10 +18,6 @@ function toUser(row) {
     avatarUrl: row.AvatarURL,
     createdAt: row.Created_at,
   };
-}
-
-function dbError(error) {
-  return new AppError(500, 'DB_ERROR', error.message);
 }
 
 export function createUserRepository(supabase) {
@@ -61,5 +57,21 @@ export function createUserRepository(supabase) {
     return data.length > 0;
   }
 
-    return { findById, createIfMissing, hasTeacherRecord };
+  async function updateProfile(id, { profileName, fullName, phoneNumber, role }) {
+    const { error } = await supabase
+      .from(TABLE)
+      .update({
+        Profile_name: profileName,
+        Fullname: fullName,
+        Phone_number: phoneNumber,
+        Role: role,
+      })
+      .eq('UserID', id);
+
+    if (error) throw dbError(error);
+  }
+  return { findById, createIfMissing, hasTeacherRecord, updateProfile };
 }
+
+
+ 

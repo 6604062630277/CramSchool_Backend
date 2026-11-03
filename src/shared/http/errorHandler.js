@@ -9,7 +9,7 @@ export function notFoundHandler(req, res) {
 export function errorHandler(err, req, res, next) {
   if (err instanceof AppError) {
     return res.status(err.statusCode).json({
-      error: { code: err.code, message: err.message },
+      error: { code: err.code, message: err.message, details: err.details },
     });
   }
   console.error(err);
