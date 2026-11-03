@@ -87,5 +87,25 @@ export function createProfileRepository(supabase) {
     if (error) throw dbError(error);
   }
 
-    return { saveAddress, saveStudent, saveTeacher, findTeachersByUserIds, deleteTeacher };
+  async function findStudentsByUserIds(userIds) {
+    if (userIds.length === 0) return [];
+
+    const { data, error } = await supabase
+      .from('Student')
+      .select('UserID, Nickname, Grade_level, School_name')
+      .in('UserID', userIds);
+
+    if (error) throw dbError(error);
+
+    return data.map((row) => ({
+      userId: row.UserID,
+      nickname: row.Nickname,
+      gradeLevel: row.Grade_level,
+      schoolName: row.School_name,
+    }));
+  }
+  return {
+    saveAddress, saveStudent, saveTeacher,
+    findTeachersByUserIds, deleteTeacher, findStudentsByUserIds,
+  };
 }

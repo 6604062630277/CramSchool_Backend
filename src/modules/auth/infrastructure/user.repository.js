@@ -92,7 +92,34 @@ export function createUserRepository(supabase) {
     if (error) throw dbError(error);
   }
   
-    return { findById, createIfMissing, hasTeacherRecord, updateProfile, listWithoutRole, updateRole };
+  async function listUsers({ role, search, limit, offset }) {
+    let query = supabase
+      .from(TABLE)
+      .select(COLUMNS, { count: 'exact' })
+      .order('Created_at', { ascending: false })
+      .range(offset, offset + limit - 1);
+
+    if (role === 'none') query = query.is('Role', null);
+    else if (role) query = query.eq('Role', role);
+
+    if (search) {
+      const s = search.replace(/[,()*%]/g, '');
+      if (s) {
+        query = query.or(
+          `Fullname.ilike.%${s}%,Profile_name.ilike.%${s}%,Email.ilike.%${s}%,Phone_number.ilike.%${s}%`,
+        );
+      }
+    }
+
+    const { data, error, count } = await query;
+    if (error) throw dbError(error);
+    return { items: data.map(toUser), total: count ?? 0 };
+  }
+  
+  return {
+    findById, createIfMissing, hasTeacherRecord, updateProfile,
+    listWithoutRole, updateRole, listUsers,
+  };
 }
 
 

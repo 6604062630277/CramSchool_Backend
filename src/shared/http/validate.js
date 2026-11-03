@@ -27,3 +27,14 @@ export function validateParams(schema) {
     next();
   };
 }
+
+export function validateQuery(schema) {
+  return (req, res, next) => {
+    const result = schema.safeParse(req.query);
+    if (!result.success) {
+      throw new AppError(400, 'VALIDATION_ERROR', 'Invalid query string', toDetails(result.error));
+    }
+    req.validatedQuery = result.data;
+    next();
+  };
+}

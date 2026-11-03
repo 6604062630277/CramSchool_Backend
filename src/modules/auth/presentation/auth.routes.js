@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { validateBody, validateParams } from '../../../shared/http/validate.js';
-import { registerSchema, userIdParamsSchema } from './auth.schemas.js';
+import { validateBody, validateParams, validateQuery } from '../../../shared/http/validate.js';
+import { registerSchema, userIdParamsSchema, listUsersQuerySchema } from './auth.schemas.js';
 import { ROLES } from '../domain/roles.js';
 
 export function createAuthRouter({ authController, adminController, requireAuth, requireRole }) {
@@ -34,5 +34,12 @@ export function createAuthRouter({ authController, adminController, requireAuth,
     adminController.rejectTeacher,
   );
 
+  router.get(
+    '/admin/users',
+    ...adminOnly,
+    validateQuery(listUsersQuerySchema),
+    adminController.listUsers,
+  );
+  
   return router;
 }

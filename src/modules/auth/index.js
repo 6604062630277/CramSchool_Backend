@@ -9,6 +9,7 @@ import { createAuthRouter } from './presentation/auth.routes.js';
 import { createProfileRepository } from './infrastructure/profile.repository.js';
 import { createTeacherApprovalService } from './application/teacherApproval.service.js';
 import { createAdminController } from './presentation/admin.controller.js';
+import { createUserAdminService } from './application/userAdmin.service.js';
 import { ROLES } from './domain/roles.js';
 
 // infrastructure
@@ -19,6 +20,7 @@ const profileRepository = createProfileRepository(supabaseAdmin);
 // application
 const authService = createAuthService({ authGateway, userRepository });
 const accountService = createAccountService({ userRepository, profileRepository });
+const userAdminService = createUserAdminService({ userRepository, profileRepository });
 const teacherApprovalService = createTeacherApprovalService({
   userRepository,
   profileRepository,
@@ -28,8 +30,9 @@ const teacherApprovalService = createTeacherApprovalService({
 // presentation
 const { requireAuth, requireRole } = createAuthMiddleware(authService);
 const authController = createAuthController({ accountService });
-const adminController = createAdminController({ teacherApprovalService });
+const adminController = createAdminController({ teacherApprovalService, userAdminService });
 
 // public API ของโมดูล
 export const authRouter = createAuthRouter({ authController, adminController, requireAuth, requireRole });
 export { requireAuth, requireRole, ROLES };
+

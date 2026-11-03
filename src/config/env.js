@@ -13,4 +13,7 @@ export const env = {
   port: Number(process.env.PORT) || 5000,
   supabaseUrl: process.env.SUPABASE_URL,
   supabaseSecretKey: process.env.SUPABASE_SECRET_KEY,
+  corsOrigins: (process.env.CORS_ORIGINS ?? 'http://localhost:5173')   // ← ใหม่
+    .split(',')
+    .map((s) => s.trim()),
 };
