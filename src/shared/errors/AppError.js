@@ -7,6 +7,9 @@ export class AppError extends Error {
   }
 }
 
+export const NotFound = (message = 'Not found', code = 'NOT_FOUND') =>
+  new AppError(404, code, message);
+
 export const Unauthorized = (message = 'Unauthorized', code = 'UNAUTHORIZED') =>
   new AppError(401, code, message);
 

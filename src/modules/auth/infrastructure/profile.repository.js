@@ -61,5 +61,31 @@ export function createProfileRepository(supabase) {
     });
   }
 
-  return { saveAddress, saveStudent, saveTeacher };
+    // ใบสมัครครูของ user หลายคนในครั้งเดียว
+  async function findTeachersByUserIds(userIds) {
+    if (userIds.length === 0) return [];
+
+    const { data, error } = await supabase
+      .from('Teachers')
+      .select('UserID, Workplace_name, Bank_name, Bankaccount_name, Bankaccount_number, Promptpay_number')
+      .in('UserID', userIds);
+
+    if (error) throw dbError(error);
+
+    return data.map((row) => ({
+      userId: row.UserID,
+      workplaceName: row.Workplace_name,
+      bankName: row.Bank_name,
+      bankAccountName: row.Bankaccount_name,
+      bankAccountNumber: row.Bankaccount_number,
+      promptpayNumber: row.Promptpay_number,
+    }));
+  }
+
+  async function deleteTeacher(userId) {
+    const { error } = await supabase.from('Teachers').delete().eq('UserID', userId);
+    if (error) throw dbError(error);
+  }
+
+    return { saveAddress, saveStudent, saveTeacher, findTeachersByUserIds, deleteTeacher };
 }

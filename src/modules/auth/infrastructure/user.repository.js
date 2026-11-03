@@ -70,7 +70,29 @@ export function createUserRepository(supabase) {
 
     if (error) throw dbError(error);
   }
-  return { findById, createIfMissing, hasTeacherRecord, updateProfile };
+
+    // ผู้ใช้ทุกคนที่ยังไม่มี role
+  async function listWithoutRole() {
+    const { data, error } = await supabase
+      .from(TABLE)
+      .select(COLUMNS)
+      .is('Role', null)
+      .order('Created_at', { ascending: true });
+
+    if (error) throw dbError(error);
+    return data.map(toUser);
+  }
+
+  async function updateRole(id, role) {
+    const { error } = await supabase
+      .from(TABLE)
+      .update({ Role: role })
+      .eq('UserID', id);
+
+    if (error) throw dbError(error);
+  }
+  
+    return { findById, createIfMissing, hasTeacherRecord, updateProfile, listWithoutRole, updateRole };
 }
 
 

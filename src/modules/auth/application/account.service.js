@@ -1,4 +1,5 @@
 import { ROLES } from '../domain/roles.js';
+import { NotFound } from '../../../shared/errors/AppError.js';
 import {
   getAccountStatus,
   assertCanRegister,
@@ -9,6 +10,7 @@ import {
 export function createAccountService({ userRepository, profileRepository }) {
   async function getMe(userId) {
     const profile = await userRepository.findById(userId);
+    if (!profile) throw NotFound('User not found', 'USER_NOT_FOUND');
     const hasTeacherApplication =
       !profile.role && (await userRepository.hasTeacherRecord(userId));
 

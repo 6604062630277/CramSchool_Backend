@@ -29,3 +29,10 @@ export function roleAfterRegistration(requestedRole) {
 export function buildFullName(firstName, lastName) {
   return `${firstName} ${lastName}`.trim();
 }
+
+// กฎ: อนุมัติหรือปฏิเสธได้เฉพาะครูที่รออนุมัติอยู่
+export function assertPendingApproval(status) {
+  if (status !== ACCOUNT_STATUS.PENDING_APPROVAL) {
+    throw Conflict('User is not waiting for approval', 'NOT_PENDING');
+  }
+}

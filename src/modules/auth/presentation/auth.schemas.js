@@ -49,3 +49,7 @@ export const registerSchema = z
       ctx.addIssue({ code: 'custom', path: ['teacher'], message: 'ต้องกรอกข้อมูลครู' });
     }
   });
+
+export const userIdParamsSchema = z.object({
+  userId: z.string().uuid('userId ต้องเป็น UUID'),
+});
