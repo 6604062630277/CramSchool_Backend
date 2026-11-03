@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import { env } from './config/env.js';
 import { authRouter } from './modules/auth/index.js';
 import { notFoundHandler, errorHandler } from './shared/http/errorHandler.js';
+import { courseRouter } from './modules/course/index.js';
 
 const app = express();
 
@@ -17,6 +18,7 @@ app.get('/api/health', (req, res) => {
 
 // ---- โมดูล ----
 app.use('/api/v1', authRouter);
+app.use('/api/v1', courseRouter);
 // app.use('/api/v1', courseRouter);   ← โมดูลถัดไปจะมาต่อตรงนี้
 
 app.use(notFoundHandler);
