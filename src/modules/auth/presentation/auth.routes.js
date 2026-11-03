@@ -19,7 +19,7 @@ export function createAuthRouter({ authController, adminController, requireAuth,
 
   // ---- admin ----
   router.get('/admin/teachers/pending', ...adminOnly, adminController.listPendingTeachers);
-
+  router.get('/admin/teachers', ...adminOnly, adminController.listTeachers);
   router.post(
     '/admin/teachers/:userId/approve',
     ...adminOnly,

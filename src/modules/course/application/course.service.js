@@ -1,6 +1,18 @@
-import { assertCourseOpen, assertCourseExists } from '../domain/course.rules.js';
+import {
+  assertCourseOpen,
+  assertCourseExists,
+  assertTeacherAssignable,
+  assertNotAssigned,
+} from '../domain/course.rules.js';
 
-export function createCourseService({ courseRepository }) {
+export function createCourseService({ courseRepository, courseTeacherRepository, teacherDirectory }) {
+  // เติมรายชื่อครูให้คอร์ส
+  async function withTeachers(course) {
+    const teacherIds = await courseTeacherRepository.listTeacherIds(course.id);
+    const teachers = await teacherDirectory.getByTeacherIds(teacherIds);
+    return { ...course, teachers };
+  }
+
   async function listOpen() {
     return courseRepository.list({ includeInactive: false });
   }
@@ -12,17 +24,16 @@ export function createCourseService({ courseRepository }) {
   async function getOpen(courseId) {
     const course = await courseRepository.findById(courseId);
     assertCourseOpen(course);
-    return course;
+    return withTeachers(course);
   }
 
   async function getAny(courseId) {
     const course = await courseRepository.findById(courseId);
     assertCourseExists(course);
-    return course;
+    return withTeachers(course);
   }
 
   async function create(input) {
-    // คอร์สใหม่เปิดรับสมัครเป็นค่าเริ่มต้น
     return courseRepository.create({ ...input, isActive: input.isActive ?? true });
   }
 
@@ -32,5 +43,22 @@ export function createCourseService({ courseRepository }) {
     return course;
   }
 
-  return { listOpen, listAll, getOpen, getAny, create, update };
+  async function assignTeacher(courseId, teacherId) {
+    assertCourseExists(await courseRepository.findById(courseId));
+
+    const [teacher] = await teacherDirectory.getByTeacherIds([teacherId]);
+    assertTeacherAssignable(teacher);
+    assertNotAssigned(await courseTeacherRepository.exists(courseId, teacherId));
+
+    await courseTeacherRepository.add(courseId, teacherId);
+    return getAny(courseId);
+  }
+
+  async function removeTeacher(courseId, teacherId) {
+    assertCourseExists(await courseRepository.findById(courseId));
+    await courseTeacherRepository.remove(courseId, teacherId);
+    return getAny(courseId);
+  }
+
+  return { listOpen, listAll, getOpen, getAny, create, update, assignTeacher, removeTeacher };
 }

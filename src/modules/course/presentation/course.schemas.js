@@ -24,3 +24,12 @@ export const updateCourseSchema = z
   .object(courseFields)
   .partial()
   .refine((v) => Object.keys(v).length > 0, 'ต้องส่งข้อมูลที่จะแก้อย่างน้อย 1 ช่อง');
+
+export const assignTeacherSchema = z.object({
+  teacherId: z.string().uuid('teacherId ต้องเป็น UUID'),
+});
+
+export const courseTeacherParamsSchema = z.object({
+  courseId: z.string().uuid('courseId ต้องเป็น UUID'),
+  teacherId: z.string().uuid('teacherId ต้องเป็น UUID'),
+});

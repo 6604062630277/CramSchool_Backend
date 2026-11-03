@@ -1,6 +1,12 @@
 import { Router } from 'express';
 import { validateBody, validateParams } from '../../../shared/http/validate.js';
-import { courseIdParamsSchema, createCourseSchema, updateCourseSchema } from './course.schemas.js';
+import {
+  courseIdParamsSchema,
+  createCourseSchema,
+  updateCourseSchema,
+  assignTeacherSchema,
+  courseTeacherParamsSchema,
+} from './course.schemas.js';
 
 export function createCourseRouter({ courseController, requireAuth, requireRole, ROLES }) {
   const router = Router();
@@ -21,6 +27,21 @@ export function createCourseRouter({ courseController, requireAuth, requireRole,
     withCourseId,
     validateBody(updateCourseSchema),
     courseController.update,
+  );
+
+  router.post(
+    '/admin/courses/:courseId/teachers',
+    ...adminOnly,
+    withCourseId,
+    validateBody(assignTeacherSchema),
+    courseController.assignTeacher,
+  );
+  
+  router.delete(
+    '/admin/courses/:courseId/teachers/:teacherId',
+    ...adminOnly,
+    validateParams(courseTeacherParamsSchema),
+    courseController.removeTeacher,
   );
 
   return router;

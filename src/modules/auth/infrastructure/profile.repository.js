@@ -67,12 +67,13 @@ export function createProfileRepository(supabase) {
 
     const { data, error } = await supabase
       .from('Teachers')
-      .select('UserID, Workplace_name, Bank_name, Bankaccount_name, Bankaccount_number, Promptpay_number')
+      .select('TeacherID, UserID, Workplace_name, Bank_name, Bankaccount_name, Bankaccount_number, Promptpay_number') // ← เพิ่ม TeacherID
       .in('UserID', userIds);
 
     if (error) throw dbError(error);
 
     return data.map((row) => ({
+      teacherId: row.TeacherID,                                   // ← เพิ่ม
       userId: row.UserID,
       workplaceName: row.Workplace_name,
       bankName: row.Bank_name,
@@ -104,8 +105,20 @@ export function createProfileRepository(supabase) {
       schoolName: row.School_name,
     }));
   }
+
+  async function findTeachersByTeacherIds(teacherIds) {
+    if (teacherIds.length === 0) return [];
+
+    const { data, error } = await supabase
+      .from('Teachers')
+      .select('TeacherID, UserID')
+      .in('TeacherID', teacherIds);
+
+    if (error) throw dbError(error);
+    return data.map((row) => ({ teacherId: row.TeacherID, userId: row.UserID }));
+  }
   return {
     saveAddress, saveStudent, saveTeacher,
-    findTeachersByUserIds, deleteTeacher, findStudentsByUserIds,
+    findTeachersByUserIds, deleteTeacher, findStudentsByUserIds, findTeachersByTeacherIds,
   };
 }

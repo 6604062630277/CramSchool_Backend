@@ -1,16 +1,17 @@
 import { supabaseAdmin } from '../../shared/infrastructure/supabase.js';
-import { requireAuth, requireRole, ROLES } from '../auth/index.js';   // ← ใช้ของโมดูลอื่น
-
+import { requireAuth, requireRole, ROLES, teacherDirectory } from '../auth/index.js';   // ← ใช้ของโมดูลอื่น
 import { createCourseRepository } from './infrastructure/course.repository.js';
 import { createCourseService } from './application/course.service.js';
 import { createCourseController } from './presentation/course.controller.js';
 import { createCourseRouter } from './presentation/course.routes.js';
+import { createCourseTeacherRepository } from './infrastructure/courseTeacher.repository.js';
 
 // infrastructure
 const courseRepository = createCourseRepository(supabaseAdmin);
+const courseTeacherRepository = createCourseTeacherRepository(supabaseAdmin);
 
 // application
-const courseService = createCourseService({ courseRepository });
+const courseService = createCourseService({ courseRepository, courseTeacherRepository, teacherDirectory });
 
 // presentation
 const courseController = createCourseController({ courseService });

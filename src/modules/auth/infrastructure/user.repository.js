@@ -115,10 +115,18 @@ export function createUserRepository(supabase) {
     if (error) throw dbError(error);
     return { items: data.map(toUser), total: count ?? 0 };
   }
+
+  async function findByIds(ids) {
+    if (ids.length === 0) return [];
+
+    const { data, error } = await supabase.from(TABLE).select(COLUMNS).in('UserID', ids);
+    if (error) throw dbError(error);
+    return data.map(toUser);
+  }
   
   return {
     findById, createIfMissing, hasTeacherRecord, updateProfile,
-    listWithoutRole, updateRole, listUsers,
+    listWithoutRole, updateRole, listUsers, findByIds, 
   };
 }
 

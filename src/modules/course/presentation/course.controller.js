@@ -25,5 +25,15 @@ export function createCourseController({ courseService }) {
       const course = await courseService.update(req.params.courseId, req.body);
       res.json({ data: course });
     },
+
+    async assignTeacher(req, res) {
+      const course = await courseService.assignTeacher(req.params.courseId, req.body.teacherId);
+      res.status(201).json({ data: course });
+    },
+
+    async removeTeacher(req, res) {
+      const course = await courseService.removeTeacher(req.params.courseId, req.params.teacherId);
+      res.json({ data: course });
+    },
   };
 }

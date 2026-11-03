@@ -1,4 +1,4 @@
-export function createAdminController({ teacherApprovalService, userAdminService }){
+export function createAdminController({ teacherApprovalService, userAdminService, teacherDirectoryService }) {
   return {
     async listPendingTeachers(req, res) {
       const items = await teacherApprovalService.listPending();
@@ -18,6 +18,10 @@ export function createAdminController({ teacherApprovalService, userAdminService
     async listUsers(req, res) {
       const result = await userAdminService.listUsers(req.validatedQuery);
       res.json({ data: result });
+    },
+
+    async listTeachers(req, res) {
+      res.json({ data: await teacherDirectoryService.listApproved() });
     },
   };
 }
